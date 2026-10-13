@@ -14,9 +14,26 @@ android {
         versionName '1.9'
     }
 
+    // Подпись берётся из переменных окружения (их задаёт GitHub Actions из секретов).
+    // Без KEYSTORE_FILE release остаётся неподписанным, debug подписывается отладочным ключом.
+    signingConfigs {
+        release {
+            def keystorePath = System.getenv('KEYSTORE_FILE')
+            if (keystorePath) {
+                storeFile file(keystorePath)
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            if (System.getenv('KEYSTORE_FILE')) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
