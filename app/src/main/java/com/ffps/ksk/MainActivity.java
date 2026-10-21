@@ -413,32 +413,20 @@ public class MainActivity extends Activity {
         final Runnable[] next = new Runnable[1];
         next[0] = () -> {
             if (state[0] >= items.size()) {
-                handler.postDelayed(done, delay * 1000L); // "Задержка запуска" — от старта последнего пункта
+                // "Задержка запуска" — от старта последнего пункта (для ожидаемой команды — от её завершения)
+                handler.postDelayed(done, delay * 1000L);
                 return;
             }
             final AutostartItem item = items.get(state[0]);
-            handler.postDelayed(() -> {
-                if (runItem(item)) {
+            handler.postDelayed(() -> ItemRunner.run(this, item, item.waitDone, null, ok -> {
+                if (ok) {
                     state[1]++;
                 }
                 state[0]++;
                 next[0].run();
-            }, item.pause * 1000L);
+            }), item.pause * 1000L);
         };
         handler.postDelayed(next[0], 1000);
-    }
-
-    private boolean runItem(AutostartItem item) {
-        try {
-            if (item.type == AutostartItem.SHELL) {
-                Shell.run(item.target, item.root);
-            } else {
-                startActivity(AppUtil.launchIntent(getPackageManager(), item.target));
-            }
-            return true;
-        } catch (Exception e) {
-            return false; // приложение удалено, нет su и т.п. — пропускаем пункт
-        }
     }
 
     private void openSettings() {

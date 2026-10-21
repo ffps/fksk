@@ -42,7 +42,7 @@
     <string name="apps_last">Последний запуск: %1$s, запущено %2$s из %3$s</string>
 
     <string name="items_count">Пунктов: %1$d, включено: %2$d</string>
-    <string name="autostart_hint">Пункты выполняются сверху вниз после загрузки системы. «Пауза» отсчитывается перед запуском пункта, «Задержка запуска» из настроек — после запуска последнего пункта, затем открывается киоск. Нажмите на пункт, чтобы изменить или удалить его.</string>
+    <string name="autostart_hint">Пункты выполняются сверху вниз после загрузки системы. «Пауза» отсчитывается перед запуском пункта, «Задержка запуска» из настроек — после запуска последнего пункта, затем открывается киоск. Нажмите на пункт, чтобы изменить, проверить кнопкой «Тест» или удалить его.</string>
     <string name="autostart_empty">Список пуст. Нажмите «Добавить».</string>
     <string name="autostart_add">Добавить</string>
     <string name="item_new">Новый пункт</string>
@@ -60,6 +60,24 @@
     <string name="delete">Удалить</string>
     <string name="toast_need_command">Введите команду</string>
     <string name="toast_need_app">Выберите приложение</string>
+
+    <string name="wait_done">Ждать завершения команды (не дольше 5 минут)</string>
+    <string name="wait_short">ждать</string>
+    <string name="res_running">выполняется</string>
+    <string name="res_code">код возврата: %1$d</string>
+    <string name="res_cancelled">остановлено</string>
+    <string name="res_timeout">прервано по таймауту (%1$d с)</string>
+    <string name="res_start_error">ошибка запуска: %1$s</string>
+    <string name="res_app_ok">запущено</string>
+    <string name="res_app_error">ошибка запуска (%1$s)</string>
+    <string name="res_interrupted">прервано: приложение было перезапущено</string>
+    <string name="last_run">Последний запуск: %1$s · %2$s</string>
+    <string name="never_run">Ещё не запускалось</string>
+    <string name="test">Тест</string>
+    <string name="stop">Стоп</string>
+    <string name="copy_log">Копировать журнал</string>
+    <string name="log_label">Журнал выполнения</string>
+    <string name="log_copied">Журнал скопирован</string>
 
     <string name="not_set">не задано</string>
     <string name="schedule_off">выключено</string>
