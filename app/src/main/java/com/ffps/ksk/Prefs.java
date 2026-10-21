@@ -14,7 +14,9 @@ final class Prefs {
     static final String PULL_REFRESH = "pull_refresh";
     static final String OVERLAY = "overlay";
     static final String LAUNCH_APP = "launch_app";
-    static final String AUTOSTART_APPS = "autostart_apps";
+    static final String AUTOSTART_APPS = "autostart_apps"; // прежний формат, нужен для переноса
+    static final String AUTOSTART_ITEMS = "autostart_items";
+    static final String AUTOSTART_LIST = "autostart_list";
     static final String APPS_PAUSE = "apps_pause";
     static final String LAST_APPS = "last_apps_run";
     static final String LAST_BOOT_ID = "last_boot_id";

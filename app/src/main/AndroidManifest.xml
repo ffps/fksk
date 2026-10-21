@@ -46,6 +46,11 @@
             android:exported="false"
             android:label="@string/settings_title" />
 
+        <activity
+            android:name=".AutostartActivity"
+            android:exported="false"
+            android:label="@string/pref_autostart_apps_title" />
+
         <receiver
             android:name=".BootReceiver"
             android:exported="true">

@@ -17,7 +17,7 @@
     <string name="boot_last">Последний сигнал загрузки: %1$s (%2$s), результат: %3$s</string>
 
     <string name="pref_launch_delay_title">Задержка запуска, сек</string>
-    <string name="pref_launch_delay_dialog">Пауза перед открытием киоска. Если выбраны приложения для автостарта — отсчитывается от запуска последнего из них, иначе от загрузки системы. 0 — сразу.</string>
+    <string name="pref_launch_delay_dialog">Пауза перед открытием киоска. Если в списке автостарта есть включённые пункты — отсчитывается от запуска последнего из них, иначе от загрузки системы. 0 — сразу.</string>
     <string name="pref_overlay_title">Разрешение «Поверх других окон»</string>
     <string name="overlay_on">Разрешено</string>
     <string name="overlay_off">Не разрешено. Нажмите, чтобы открыть настройку. Без неё на Android 10 и новее система блокирует автозапуск при загрузке.</string>
@@ -34,11 +34,32 @@
     <string name="pref_pull_title">Обновление свайпом вниз</string>
     <string name="pref_pull_summary">Потяните страницу вниз, когда она в самом верху</string>
     <string name="pref_launch_app_title">Запускать приложение</string>
+    <string name="pref_launch_app_dialog">Приложение для запуска свайпом вверх</string>
+    <string name="pref_launch_app_summary">Запускается свайпом вверх в нижней половине экрана. Сейчас: %1$s</string>
     <string name="app_not_found">Приложение не найдено</string>
 
-    <string name="pref_autostart_apps_title">Автостарт приложений</string>
-    <string name="pref_apps_pause_title">Пауза между запусками приложений, сек</string>
+    <string name="pref_autostart_apps_title">Автостарт приложений и команд</string>
     <string name="apps_last">Последний запуск: %1$s, запущено %2$s из %3$s</string>
+
+    <string name="items_count">Пунктов: %1$d, включено: %2$d</string>
+    <string name="autostart_hint">Пункты выполняются сверху вниз после загрузки системы. «Пауза» отсчитывается перед запуском пункта, «Задержка запуска» из настроек — после запуска последнего пункта, затем открывается киоск. Нажмите на пункт, чтобы изменить или удалить его.</string>
+    <string name="autostart_empty">Список пуст. Нажмите «Добавить».</string>
+    <string name="autostart_add">Добавить</string>
+    <string name="item_new">Новый пункт</string>
+    <string name="item_edit">Изменить пункт</string>
+    <string name="type_app">Приложение</string>
+    <string name="type_shell">Команда shell</string>
+    <string name="command_hint">Например: am start -n пакет/.Активность</string>
+    <string name="use_root">Использовать root</string>
+    <string name="use_root_short">root</string>
+    <string name="pause_label">Пауза перед запуском, сек</string>
+    <string name="pause_short">пауза %1$d с</string>
+    <string name="not_found_suffix"> (не найдено)</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="delete">Удалить</string>
+    <string name="toast_need_command">Введите команду</string>
+    <string name="toast_need_app">Выберите приложение</string>
 
     <string name="not_set">не задано</string>
     <string name="schedule_off">выключено</string>

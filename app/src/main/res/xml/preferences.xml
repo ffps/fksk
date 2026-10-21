@@ -35,7 +35,7 @@
 
     <ListPreference
         android:defaultValue=""
-        android:dialogTitle="@string/pref_launch_app_title"
+        android:dialogTitle="@string/pref_launch_app_dialog"
         android:key="launch_app"
         android:title="@string/pref_launch_app_title" />
 
@@ -44,16 +44,9 @@
         android:key="autostart"
         android:title="@string/pref_autostart_title" />
 
-    <MultiSelectListPreference
-        android:dialogTitle="@string/pref_autostart_apps_title"
-        android:key="autostart_apps"
+    <Preference
+        android:key="autostart_list"
         android:title="@string/pref_autostart_apps_title" />
-
-    <EditTextPreference
-        android:defaultValue="1"
-        android:inputType="number"
-        android:key="apps_pause"
-        android:title="@string/pref_apps_pause_title" />
 
     <EditTextPreference
         android:defaultValue="10"

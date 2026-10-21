@@ -383,52 +383,62 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Автостарт приложений: после загрузки системы по очереди запускает выбранные приложения
-     * (пауза между ними), затем ждёт "Задержку запуска" от старта последнего и возвращает киоск на экран.
+     * Автостарт: после загрузки системы по очереди выполняет включённые пункты списка (приложение или
+     * команда shell), перед каждым ждёт его паузу. После запуска последнего пункта ждёт "Задержку запуска"
+     * и возвращает киоск на экран.
      */
     private void startAppSequence() {
-        Set<String> selected = prefs.getStringSet(Prefs.AUTOSTART_APPS, null);
-        if (selected == null || selected.isEmpty()) {
-            return;
-        }
-        final List<String> pkgs = new ArrayList<>();
-        for (String[] app : AppUtil.listApps(this)) { // по алфавиту названий
-            if (selected.contains(app[1])) {
-                pkgs.add(app[1]);
+        final List<AutostartItem> items = new ArrayList<>();
+        for (AutostartItem item : AutostartItems.load(this, prefs)) {
+            if (item.enabled) {
+                items.add(item);
             }
         }
-        if (pkgs.isEmpty()) {
+        if (items.isEmpty()) {
             return;
         }
-        final int pause = Math.max(0, Prefs.getInt(prefs, Prefs.APPS_PAUSE, Prefs.DEF_APPS_PAUSE));
         final int delay = Math.max(0, Prefs.getInt(prefs, Prefs.LAUNCH_DELAY, Prefs.DEF_LAUNCH_DELAY));
-        final int[] state = {0, 0}; // индекс следующего приложения, число запущенных без ошибки
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (state[0] < pkgs.size()) {
-                    try {
-                        startActivity(AppUtil.launchIntent(getPackageManager(), pkgs.get(state[0])));
-                        state[1]++;
-                    } catch (Exception ignored) {
-                        // приложение удалено или не запускается — пропускаем
-                    }
-                    state[0]++;
-                    long wait = state[0] < pkgs.size() ? pause : delay;
-                    handler.postDelayed(this, wait * 1000L);
-                } else {
-                    prefs.edit().putString(Prefs.LAST_APPS,
-                            System.currentTimeMillis() + "|" + state[1] + "|" + pkgs.size()).commit();
-                    Intent back = new Intent(MainActivity.this, MainActivity.class);
-                    back.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    try {
-                        startActivity(back);
-                    } catch (Exception ignored) {
-                        // на Android 10+ без разрешения "Поверх других окон" система может не пустить
-                    }
-                }
+        final int[] state = {0, 0}; // индекс следующего пункта, число запущенных без ошибки
+        final Runnable done = () -> {
+            prefs.edit().putString(Prefs.LAST_APPS,
+                    System.currentTimeMillis() + "|" + state[1] + "|" + items.size()).commit();
+            Intent back = new Intent(this, MainActivity.class);
+            back.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            try {
+                startActivity(back);
+            } catch (Exception ignored) {
+                // на Android 10+ без разрешения "Поверх других окон" система может не пустить
             }
-        }, 1000);
+        };
+        final Runnable[] next = new Runnable[1];
+        next[0] = () -> {
+            if (state[0] >= items.size()) {
+                handler.postDelayed(done, delay * 1000L); // "Задержка запуска" — от старта последнего пункта
+                return;
+            }
+            final AutostartItem item = items.get(state[0]);
+            handler.postDelayed(() -> {
+                if (runItem(item)) {
+                    state[1]++;
+                }
+                state[0]++;
+                next[0].run();
+            }, item.pause * 1000L);
+        };
+        handler.postDelayed(next[0], 1000);
+    }
+
+    private boolean runItem(AutostartItem item) {
+        try {
+            if (item.type == AutostartItem.SHELL) {
+                Shell.run(item.target, item.root);
+            } else {
+                startActivity(AppUtil.launchIntent(getPackageManager(), item.target));
+            }
+            return true;
+        } catch (Exception e) {
+            return false; // приложение удалено, нет su и т.п. — пропускаем пункт
+        }
     }
 
     private void openSettings() {

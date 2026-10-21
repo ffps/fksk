@@ -32,8 +32,7 @@ public class BootReceiver extends BroadcastReceiver {
             result = context.getString(R.string.boot_res_off);
         } else {
             int delay = Math.max(0, Prefs.getInt(p, Prefs.LAUNCH_DELAY, Prefs.DEF_LAUNCH_DELAY));
-            Set<String> apps = p.getStringSet(Prefs.AUTOSTART_APPS, null);
-            boolean hasApps = apps != null && !apps.isEmpty();
+            boolean hasApps = AutostartItems.hasEnabled(context, p);
             // с автостартом приложений паузу перед открытием киоска отсчитывает сам киоск
             if (delay == 0 || hasApps) {
                 result = launch(context);
