@@ -1,8 +1,4 @@
-
-<p align="center"><img src="https://github.com/ffps/ksk/blob/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png?raw=true" /></p>
-
-
-# fKiosk — киоск из старого планшета/телефона
+# <p align="center"><img src="icons/fkiosk.svg" /><br />fKiosk — киоск из старого планшета/телефона</p>
 
 Полноэкранный браузер (WebView) для Android 4.2+, без root.
 
