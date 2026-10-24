@@ -1,6 +1,7 @@
 package com.ffps.ksk;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -8,6 +9,7 @@ import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -58,6 +60,9 @@ public class MainActivity extends Activity {
     // состояние загрузки
     private static boolean bootChecked; // проверка "первый запуск после загрузки" — раз за процесс
     private boolean bootPending;
+    private boolean hwAccelApplied;
+    private long lastCleanup;
+    private int cleanups;
     private boolean started;
     private boolean autoOpenedSettings;
     private int attempt;
@@ -88,6 +93,7 @@ public class MainActivity extends Activity {
                 nextReload = Schedule.next(schedule, now);
                 reloadNow();
             }
+            maybeCleanup();
             handler.postDelayed(this, TICK_MS);
         }
     };
@@ -104,6 +110,16 @@ public class MainActivity extends Activity {
                 Boot.mark(this, prefs);
                 bootPending = true;
             }
+        }
+        hwAccelApplied = prefs.getBoolean(Prefs.HW_ACCEL, true);
+        if (hwAccelApplied) {
+            // в манифесте для окна киоска ускорение выключено; включаем его до создания содержимого
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                    WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+        }
+        lastCleanup = SystemClock.elapsedRealtime();
+        if (Prefs.getInt(prefs, Prefs.HEALTH_MINUTES, Prefs.DEF_HEALTH_MINUTES) > 0) {
+            writeHealth(bootPending ? "старт после загрузки системы" : "старт приложения");
         }
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -198,6 +214,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (prefs.getBoolean(Prefs.HW_ACCEL, true) != hwAccelApplied) {
+            recreate(); // режим отрисовки окна меняется только при его пересоздании
+            return;
+        }
         web.onResume();
 
         String oldUrl = url;
@@ -226,6 +246,8 @@ public class MainActivity extends Activity {
             bootPending = false;
             startAppSequence();
         }
+
+        rescheduleHealth();
     }
 
     @Override
@@ -302,6 +324,72 @@ public class MainActivity extends Activity {
                 + "<h2>" + TextUtils.htmlEncode(title) + "</h2>"
                 + "<p>" + TextUtils.htmlEncode(text).replace("\n", "<br>") + "</p></body></html>";
         web.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+    }
+
+    private final Runnable healthTick = new Runnable() {
+        @Override
+        public void run() {
+            int minutes = Prefs.getInt(prefs, Prefs.HEALTH_MINUTES, Prefs.DEF_HEALTH_MINUTES);
+            if (minutes > 0) {
+                writeHealth(null);
+                handler.postDelayed(this, minutes * 60000L);
+            }
+        }
+    };
+
+    private void rescheduleHealth() {
+        handler.removeCallbacks(healthTick);
+        if (Prefs.getInt(prefs, Prefs.HEALTH_MINUTES, Prefs.DEF_HEALTH_MINUTES) > 0) {
+            handler.postDelayed(healthTick, 3000);
+        }
+    }
+
+    /** Запись в журнал состояния: данные собираются и пишутся в фоне, чтобы не тормозить окно. */
+    private void writeHealth(String event) {
+        final Context app = getApplicationContext();
+        final String state = "страница: " + (showingError ? "ошибка загрузки" : "ok")
+                + ", попыток " + attempt + ", очисток " + cleanups
+                + ", ускорение " + (hwAccelApplied ? "вкл" : "выкл")
+                + (event != null ? " | " + event : "");
+        new Thread(() -> HealthLog.append(app, HealthLog.snapshot(app, state))).start();
+    }
+
+    private void maybeCleanup() {
+        int hours = Prefs.getInt(prefs, Prefs.CLEANUP_HOURS, Prefs.DEF_CLEANUP_HOURS);
+        if (hours > 0 && SystemClock.elapsedRealtime() - lastCleanup >= hours * 3600000L) {
+            cleanupMemory();
+        }
+    }
+
+    /** Очистка памяти: сбрасывает кэш, пересоздаёт окно браузера и заново загружает страницу. */
+    private void cleanupMemory() {
+        lastCleanup = SystemClock.elapsedRealtime();
+        cleanups++;
+        recreateWebView();
+        System.gc();
+        if (started && url.length() > 0) {
+            reloadNow();
+        }
+        if (Prefs.getInt(prefs, Prefs.HEALTH_MINUTES, Prefs.DEF_HEALTH_MINUTES) > 0) {
+            writeHealth("очистка памяти №" + cleanups);
+        }
+    }
+
+    private void recreateWebView() {
+        WebView old = web;
+        root.removeView(old);
+        old.stopLoading();
+        old.clearCache(true);
+        old.clearHistory();
+        old.removeAllViews();
+        old.destroy();
+        web = new WebView(this);
+        web.setBackgroundColor(Color.BLACK);
+        setupWebView();
+        root.addView(web, 0, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        web.onResume();
+        cancelGestures();
     }
 
     private GestureIcon addGestureIcon(int type) {

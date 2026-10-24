@@ -19,6 +19,10 @@ final class Prefs {
     static final String AUTOSTART_LIST = "autostart_list";
     static final String APPS_PAUSE = "apps_pause";
     static final String LAST_APPS = "last_apps_run";
+    static final String HW_ACCEL = "hw_accel";
+    static final String CLEANUP_HOURS = "cleanup_hours";
+    static final String HEALTH_MINUTES = "health_minutes";
+    static final String HEALTH_VIEW = "health_view";
     static final String LAST_BOOT_ID = "last_boot_id";
 
     static final String DEF_SCHEDULE = "59 * * * *";
@@ -26,6 +30,8 @@ final class Prefs {
     static final int DEF_RETRY_PAUSE = 10;
     static final int DEF_LAUNCH_DELAY = 10;
     static final int DEF_APPS_PAUSE = 1;
+    static final int DEF_CLEANUP_HOURS = 0;
+    static final int DEF_HEALTH_MINUTES = 0;
 
     private Prefs() {
     }

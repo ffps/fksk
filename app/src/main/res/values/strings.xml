@@ -79,6 +79,26 @@
     <string name="log_label">Журнал выполнения</string>
     <string name="log_copied">Журнал скопирован</string>
 
+    <string name="cat_stability">Стабильность и диагностика</string>
+    <string name="pref_hw_accel_title">Аппаратное ускорение</string>
+    <string name="pref_hw_accel_summary">Выключите, если устройство зависает или показывает чёрный экран. Окно киоска пересоздастся сразу после выхода из настроек.</string>
+    <string name="pref_cleanup_title">Очистка памяти, часов</string>
+    <string name="pref_cleanup_dialog">Через сколько часов работы очищать кэш и пересоздавать окно браузера (освобождает память, которую накапливает старый WebView). При этом страница перезагружается. 0 — не очищать.</string>
+    <string name="pref_health_title">Журнал состояния, минут</string>
+    <string name="pref_health_dialog">Как часто записывать в файл свободную память, заряд, напряжение и температуру батареи, питание и сеть — чтобы после зависания посмотреть, что происходило перед ним. 0 — журнал не ведётся и во флеш-память ничего не пишется.</string>
+    <string name="pref_health_view_title">Открыть журнал состояния</string>
+    <string name="off">выключено</string>
+    <string name="every_hours">каждые %1$d ч</string>
+    <string name="every_minutes">каждые %1$d мин</string>
+    <string name="log_size_kb">Файл журнала: %1$d КБ</string>
+    <string name="log_empty_short">Журнал пуст</string>
+    <string name="health_title">Журнал состояния</string>
+    <string name="health_empty">Журнал пуст. Задайте в настройках «Журнал состояния, минут» больше нуля.</string>
+    <string name="health_clear_q">Очистить журнал?</string>
+    <string name="refresh">Обновить</string>
+    <string name="copy_all">Копировать</string>
+    <string name="clear">Очистить</string>
+
     <string name="not_set">не задано</string>
     <string name="schedule_off">выключено</string>
     <string name="retry_unlimited">0 — без ограничений</string>

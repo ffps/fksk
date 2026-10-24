@@ -39,6 +39,14 @@ public class SettingsActivity extends PreferenceActivity
             startActivity(new Intent(this, AutostartActivity.class));
             return true;
         });
+        findPreference(Prefs.CLEANUP_HOURS).setOnPreferenceChangeListener(
+                (p, v) -> check(inRange(str(v), 0, 720), R.string.toast_bad_number));
+        findPreference(Prefs.HEALTH_MINUTES).setOnPreferenceChangeListener(
+                (p, v) -> check(inRange(str(v), 0, 1440), R.string.toast_bad_number));
+        findPreference(Prefs.HEALTH_VIEW).setOnPreferenceClickListener(p -> {
+            startActivity(new Intent(this, HealthLogActivity.class));
+            return true;
+        });
         findPreference(Prefs.OVERLAY).setOnPreferenceClickListener(p -> {
             openOverlaySettings();
             return true;
@@ -91,6 +99,16 @@ public class SettingsActivity extends PreferenceActivity
         } else {
             overlay.setSummary(Settings.canDrawOverlays(this) ? R.string.overlay_on : R.string.overlay_off);
         }
+        int hours = Prefs.getInt(sp, Prefs.CLEANUP_HOURS, Prefs.DEF_CLEANUP_HOURS);
+        findPreference(Prefs.CLEANUP_HOURS).setSummary(
+                hours <= 0 ? getString(R.string.off) : getString(R.string.every_hours, hours));
+        int minutes = Prefs.getInt(sp, Prefs.HEALTH_MINUTES, Prefs.DEF_HEALTH_MINUTES);
+        findPreference(Prefs.HEALTH_MINUTES).setSummary(
+                minutes <= 0 ? getString(R.string.off) : getString(R.string.every_minutes, minutes));
+        long logSize = HealthLog.size(this);
+        findPreference(Prefs.HEALTH_VIEW).setSummary(logSize <= 0
+                ? getString(R.string.log_empty_short)
+                : getString(R.string.log_size_kb, (logSize + 1023) / 1024));
     }
 
     private void populateApps(ListPreference lp) {

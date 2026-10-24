@@ -64,4 +64,30 @@
         android:key="ignore_ssl"
         android:summary="@string/pref_ignore_ssl_summary"
         android:title="@string/pref_ignore_ssl_title" />
+    <PreferenceCategory android:title="@string/cat_stability">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="hw_accel"
+            android:summary="@string/pref_hw_accel_summary"
+            android:title="@string/pref_hw_accel_title" />
+
+        <EditTextPreference
+            android:defaultValue="0"
+            android:dialogMessage="@string/pref_cleanup_dialog"
+            android:inputType="number"
+            android:key="cleanup_hours"
+            android:title="@string/pref_cleanup_title" />
+
+        <EditTextPreference
+            android:defaultValue="0"
+            android:dialogMessage="@string/pref_health_dialog"
+            android:inputType="number"
+            android:key="health_minutes"
+            android:title="@string/pref_health_title" />
+
+        <Preference
+            android:key="health_view"
+            android:title="@string/pref_health_view_title" />
+    </PreferenceCategory>
 </PreferenceScreen>
