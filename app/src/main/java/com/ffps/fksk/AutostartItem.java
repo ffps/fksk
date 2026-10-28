@@ -1,4 +1,4 @@
-package com.ffps.ksk;
+package com.ffps.fksk;
 
 /** Пункт списка автостарта: приложение или команда shell. */
 final class AutostartItem {

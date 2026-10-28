@@ -1,8 +1,10 @@
-package com.ffps.ksk;
+package com.ffps.fksk;
 
+import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import java.util.List;
 
 public class SettingsActivity extends PreferenceActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private static final int REQ_STORAGE = 77;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +71,30 @@ public class SettingsActivity extends PreferenceActivity
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
+        if (Prefs.HEALTH_MINUTES.equals(key) && Prefs.getInt(sp, Prefs.HEALTH_MINUTES, 0) > 0) {
+            startHealthLog();
+        }
         refreshSummaries();
+    }
+
+    /** Журнал включён: сразу создаём файл (заголовок и первая строка). На Android 6-9 сначала просим разрешение. */
+    private void startHealthLog() {
+        if (Build.VERSION.SDK_INT >= 23 && Build.VERSION.SDK_INT < 29
+                && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQ_STORAGE);
+        }
+        HealthLog.recordAsync(getApplicationContext(), "log_enabled");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_STORAGE) {
+            boolean granted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            HealthLog.recordAsync(getApplicationContext(), granted ? "storage_granted" : "storage_denied");
+            refreshSummaries();
+        }
     }
 
     private void refreshSummaries() {
@@ -107,8 +133,8 @@ public class SettingsActivity extends PreferenceActivity
                 minutes <= 0 ? getString(R.string.off) : getString(R.string.every_minutes, minutes));
         long logSize = HealthLog.size(this);
         findPreference(Prefs.HEALTH_VIEW).setSummary(logSize <= 0
-                ? getString(R.string.log_empty_short)
-                : getString(R.string.log_size_kb, (logSize + 1023) / 1024));
+                ? getString(R.string.log_not_created, HealthLog.location(this))
+                : getString(R.string.log_file_info, HealthLog.location(this), (logSize + 1023) / 1024));
     }
 
     private void populateApps(ListPreference lp) {

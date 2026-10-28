@@ -1,4 +1,4 @@
-package com.ffps.ksk;
+package com.ffps.fksk;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,6 +7,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /** Просмотр журнала состояния: прокрутка, выделение, копирование. */
@@ -48,5 +49,6 @@ public class HealthLogActivity extends Activity {
         String s = HealthLog.readTail(this, MAX_BYTES);
         text.setText(s.length() == 0 ? getString(R.string.health_empty) : s);
         text.setSelection(text.length()); // показываем самые свежие записи
+        ((TextView) findViewById(R.id.health_path)).setText(getString(R.string.health_file, HealthLog.location(this)));
     }
 }

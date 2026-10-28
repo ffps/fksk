@@ -1,4 +1,4 @@
-package com.ffps.ksk;
+package com.ffps.fksk;
 
 import android.app.Activity;
 import android.app.AlertDialog;

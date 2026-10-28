@@ -85,7 +85,7 @@
     <string name="pref_cleanup_title">Очистка памяти, часов</string>
     <string name="pref_cleanup_dialog">Через сколько часов работы очищать кэш и пересоздавать окно браузера (освобождает память, которую накапливает старый WebView). При этом страница перезагружается. 0 — не очищать.</string>
     <string name="pref_health_title">Журнал состояния, минут</string>
-    <string name="pref_health_dialog">Как часто записывать в файл свободную память, заряд, напряжение и температуру батареи, питание и сеть — чтобы после зависания посмотреть, что происходило перед ним. 0 — журнал не ведётся и во флеш-память ничего не пишется.</string>
+    <string name="pref_health_dialog">Как часто записывать в файл Download/fksk.log (CSV) свободную память, заряд, напряжение и температуру батареи, питание и сеть — чтобы после зависания посмотреть, что происходило перед ним. Файл и заголовок создаются сразу после ввода значения больше нуля, дальше строки дописываются. 0 — журнал не ведётся и во флеш-память ничего не пишется.</string>
     <string name="pref_health_view_title">Открыть журнал состояния</string>
     <string name="off">выключено</string>
     <string name="every_hours">каждые %1$d ч</string>
@@ -98,6 +98,10 @@
     <string name="refresh">Обновить</string>
     <string name="copy_all">Копировать</string>
     <string name="clear">Очистить</string>
+
+    <string name="log_not_created">Файл ещё не создан: %1$s</string>
+    <string name="log_file_info">%1$s, %2$d КБ</string>
+    <string name="health_file">Файл: %1$s</string>
 
     <string name="not_set">не задано</string>
     <string name="schedule_off">выключено</string>

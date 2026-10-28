@@ -1,4 +1,4 @@
-package com.ffps.ksk;
+package com.ffps.fksk;
 
 import android.app.Activity;
 import android.content.Context;
@@ -119,7 +119,7 @@ public class MainActivity extends Activity {
         }
         lastCleanup = SystemClock.elapsedRealtime();
         if (Prefs.getInt(prefs, Prefs.HEALTH_MINUTES, Prefs.DEF_HEALTH_MINUTES) > 0) {
-            writeHealth(bootPending ? "старт после загрузки системы" : "старт приложения");
+            writeHealth(bootPending ? "boot_start" : "app_start");
         }
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -252,6 +252,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        publishHealthState();
         handler.removeCallbacks(ticker);
         handler.removeCallbacks(retryRunnable);
         retryPending = false;
@@ -344,14 +345,15 @@ public class MainActivity extends Activity {
         }
     }
 
-    /** Запись в журнал состояния: данные собираются и пишутся в фоне, чтобы не тормозить окно. */
+    /** Запись в журнал состояния (CSV в Download): данные собираются и пишутся в фоне. */
     private void writeHealth(String event) {
-        final Context app = getApplicationContext();
-        final String state = "страница: " + (showingError ? "ошибка загрузки" : "ok")
-                + ", попыток " + attempt + ", очисток " + cleanups
-                + ", ускорение " + (hwAccelApplied ? "вкл" : "выкл")
-                + (event != null ? " | " + event : "");
-        new Thread(() -> HealthLog.append(app, HealthLog.snapshot(app, state))).start();
+        publishHealthState();
+        HealthLog.recordAsync(getApplicationContext(), event == null ? "" : event);
+    }
+
+    /** Передаёт журналу текущее состояние страницы (его же использует экран настроек). */
+    private void publishHealthState() {
+        HealthLog.setAppState(!showingError, attempt, cleanups, hwAccelApplied);
     }
 
     private void maybeCleanup() {
@@ -371,7 +373,7 @@ public class MainActivity extends Activity {
             reloadNow();
         }
         if (Prefs.getInt(prefs, Prefs.HEALTH_MINUTES, Prefs.DEF_HEALTH_MINUTES) > 0) {
-            writeHealth("очистка памяти №" + cleanups);
+            writeHealth("cleanup_" + cleanups);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.ffps.ksk;
+package com.ffps.fksk;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -14,7 +14,7 @@ import android.provider.Settings;
 import java.util.Set;
 
 public class BootReceiver extends BroadcastReceiver {
-    static final String ACTION_LAUNCH = "com.ffps.ksk.LAUNCH";
+    static final String ACTION_LAUNCH = "com.ffps.fksk.LAUNCH";
 
     @Override
     public void onReceive(Context context, Intent intent) {

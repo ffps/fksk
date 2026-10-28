@@ -44,12 +44,33 @@ jobs:
             echo "apk=app/build/outputs/apk/debug/app-debug.apk" >> "$GITHUB_OUTPUT"
           fi
 
+      # Версия приложения берётся из тега: v1.3.0 -> versionName 1.3.0, versionCode 10300 (X*10000 + Y*100 + Z)
+      - name: Version from tag
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+            BASE="${VERSION%%[-+]*}"
+            IFS=. read -r MA MI PA _ <<< "$BASE"
+            if ! [[ "$MA" =~ ^[0-9]+$ && "${MI:-0}" =~ ^[0-9]+$ && "${PA:-0}" =~ ^[0-9]+$ ]]; then
+              echo "::error::Тег должен иметь вид v1.2.3"
+              exit 1
+            fi
+            echo "name=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "code=$((10#$MA * 10000 + 10#${MI:-0} * 100 + 10#${PA:-0}))" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=" >> "$GITHUB_OUTPUT"
+            echo "code=" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build APK
         env:
           KEYSTORE_FILE: ${{ steps.sign.outputs.file }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+          VERSION_CODE: ${{ steps.version.outputs.code }}
         run: gradle ${{ steps.sign.outputs.task }} --no-daemon
 
       - name: Show signing certificate
@@ -62,13 +83,13 @@ jobs:
           name: ksk-apk
           path: ${{ steps.sign.outputs.apk }}
 
-      # Имя файла: fKiosk-<тег без буквы v>.apk, например тег v1.1.2 -> fKiosk-1.1.2.apk
+      # Имя файла: fKsk-<тег без буквы v>.apk, например тег v1.3.0 -> fKsk-1.3.0.apk
       - name: Rename APK for release
         id: release_apk
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          NAME="fKiosk-${VERSION}.apk"
+          NAME="fKsk-${VERSION}.apk"
           cp "${{ steps.sign.outputs.apk }}" "$NAME"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
 
